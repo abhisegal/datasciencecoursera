@@ -1,0 +1,77 @@
+##Fitness Analysis
+author: Abhishek Sehgal
+
+
+ 
+*Set Working directory*
+
+```{r workdir}
+
+setwd("C:\\Users\\abhishek\\coursera\\5 - reproducible research\\week 2")  
+```
+
+*Load the Activity.csv dataset*
+
+```{r loaddata}
+act<-read.csv("activity.csv",stringsAsFactors=FALSE)  
+```
+
+*- Getting Total Steps in a day*
+*1. Plotting graph*
+*2. Mean daily steps*
+*3. Median daily steps*
+
+```{r totsteps}
+library(data.table)
+acttot<-data.table(act)[,sum(steps,na.rm=TRUE),by=date]
+setnames(acttot,names(acttot),c("date","tsum"))
+acttot$date<-sapply(acttot[,date],as.Date,format="%Y-%m-%d")
+
+par(mar=c(4,4,4,4))
+plot(acttot$date,acttot$tsum,type="h",lwd=4,xlab="Date",ylab="Steps")
+
+mean(acttot$tsum)
+
+median(acttot$tsum)
+```
+*- Getting mean Steps in 5min interval*
+*1. Mean step by interval*
+*2. Plotting graph*
+*3. Max steps interval*
+
+```{r meansteps}
+
+actm<-data.table(act)[,mean(steps,na.rm=TRUE),by=interval]
+
+plot(x=actm$interval,y=actm$V1,xlab="interval",ylab="steps",type="l")
+
+actm[,interval][which.max(actm$V1)]
+```
+
+
+*Imputing values*
+*1. Total no of missing values*
+*2  Imputing missing values*
+*3. plot new total graph*
+*4. new mean and median*
+```{r imputevalues}
+
+
+a<-is.na(act)
+sum(a)
+
+acti<-data.table(act)
+acti[is.na(acti$steps),1]<-mean(acti[,steps],na.rm=TRUE)
+
+at<-acti[,sum(steps,na.rm=TRUE),by=date]
+setnames(at,names(at),c("date","tsum"))
+at$date<-sapply(at[,date],as.Date,format="%Y-%m-%d")
+
+par(mar=c(4,4,4,4))
+plot(at$date,at$tsum,type="h",lwd=4,xlab="Date",ylab="Steps")
+
+mean(at$tsum)
+
+median(at$tsum)
+```
+
